@@ -42,14 +42,8 @@ class QuestionListSerializer(serializers.ModelSerializer):
         return [Choice(**data) for data in choice_data_list]
 
 
-class TopicSerializer(serializers.HyperlinkedModelSerializer):
+class TopicListCreateSerializer(serializers.HyperlinkedModelSerializer):
     slug = serializers.SlugField(read_only=True)
-    question_list_create_url = serializers.HyperlinkedIdentityField(
-        view_name="question-list-create",
-        lookup_field="slug",
-        lookup_url_kwarg="slug",
-        read_only=True,
-    )
     url = serializers.HyperlinkedIdentityField(
         view_name="topic-detail-edit-delete",
         lookup_field="slug",
@@ -59,20 +53,34 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Topic
-        fields = ["slug", "title", "question_list_create_url", "url"]
+        fields = ["slug", "title", "url"]
 
 
-class ChoiceListCreateSerializer(serializers.ModelSerializer):
+class TopicDetailSerializer(serializers.HyperlinkedModelSerializer):
+    questions = QuestionListSerializer(many=True, read_only=True)
+    url = serializers.HyperlinkedIdentityField(
+        view_name="topic-detail-edit-delete",
+        lookup_field="slug",
+        lookup_url_kwarg="slug",
+        read_only=True,
+    )
+
+    class Meta:
+        model = Topic
+        fields = ["slug", "title", "questions", "url"]
+
+
+class ChoiceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
         fields = ["id", "body", "is_answer"]
 
 
-class QuestionListCreateSerializer(serializers.HyperlinkedModelSerializer):
+class QuestionCreateSerializer(serializers.HyperlinkedModelSerializer):
     topic = serializers.SlugRelatedField(
         slug_field="slug", queryset=Topic.objects.all()
     )
-    choices = ChoiceListCreateSerializer(many=True)
+    choices = ChoiceCreateSerializer(many=True)
     url = serializers.HyperlinkedIdentityField(
         view_name="question-detail-edit-delete",
         lookup_field="pk",
@@ -135,7 +143,7 @@ class QuestionRetrieveUpdateDestroySerializer(serializers.ModelSerializer):
             Choice.objects.bulk_update(choice_list, ["body", "is_answer"])
         else:
             instance.choices.all().delete()  # the question type have been changed
-    
+
     def update(self, instance, validated_data):
         with transaction.atomic():
             instance.body = validated_data["body"]

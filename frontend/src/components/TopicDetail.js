@@ -3,7 +3,7 @@ import axios from "axios";
 import { Row, Col, message, Spin } from "antd";
 import { QuestionForm } from "./QuestionForm";
 import { QuestionDetail } from "./QuestionDetail";
-import { QuestionListHeaderRow } from "./QuestionListHeaderRow";
+import { TopicDetailHeaderRow } from "./TopicDetailHeaderRow";
 import * as Constants from "../constants";
 
 const spinnerStyle = {
@@ -14,18 +14,22 @@ const spinnerStyle = {
   height: "90vh"
 };
 
-export const QuestionList = props => {
+export const TopicDetail = props => {
+  const [title, setTitle] = React.useState("");
   const [questions, setQuestions] = React.useState([]);
   const [questionFormVisible, setQuestionFormVisible] = React.useState(false);
   const [questionToEdit, setQuestionToEdit] = React.useState(null);
 
-  if (!questions.length) {
+  if (Array.isArray(questions) && !questions.length) {
     const slug = props.match.params.slug;
-    const url = `${Constants.BASE_QUESTION_LIST_URL}${slug}/`;
+    const url = `${Constants.BASE_TOPIC_DETAIL_URL}${slug}/`;
+
     axios
       .get(url)
       .then(res => {
-        setQuestions(res.data);
+        setTitle(res.data.title);
+        setQuestions(res.data.questions);
+        console.log(res.data);
       })
       .catch(err => message.error("Something went wrong"));
   }
@@ -82,7 +86,10 @@ export const QuestionList = props => {
       ) : (
         <Row>
           <Col span={12} offset={2}>
-            <QuestionListHeaderRow onAddButtonClick={setQuestionFormVisible} />
+            <TopicDetailHeaderRow
+              title={title}
+              onAddButtonClick={setQuestionFormVisible}
+            />
             {questions.map(question => (
               <QuestionDetail
                 key={question.id}

@@ -186,7 +186,7 @@ export const QuestionForm = ({
 
   const createQuestion = newQuestion => {
     setQuestionSubmitLoading(true);
-    const url = `${Constants.BASE_QUESTION_CREATE_URL}${slug}/`;
+    const url = `${Constants.QUESTION_CREATE_URL}`;
     axios
       .post(url, newQuestion, {
         headers: {

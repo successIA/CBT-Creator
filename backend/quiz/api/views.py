@@ -9,11 +9,12 @@ from ..models import Choice, Question, Topic
 from ..utils import get_real_question, is_correct_answer
 from .serializers import (
     ChoiceSerializer,
-    QuestionListCreateSerializer,
+    QuestionCreateSerializer,
     QuestionListSerializer,
     QuestionRetrieveUpdateDestroySerializer,
     TopicListSerializer,
-    TopicSerializer,
+    TopicListCreateSerializer,
+    TopicDetailSerializer,
 )
 
 
@@ -61,22 +62,19 @@ class ScoreRetreiveView(APIView):
 
 class TopicListCreateView(generics.ListCreateAPIView):
     queryset = Topic.objects.all()
-    serializer_class = TopicSerializer
+    serializer_class = TopicListCreateSerializer
 
 
 class TopicRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Topic.objects.all()
-    serializer_class = TopicSerializer
+    serializer_class = TopicDetailSerializer
     lookup_field = "slug"
     lookup_url_kwarg = "slug"
 
 
-class QuestionListCreateView(generics.ListCreateAPIView):
+class QuestionCreateView(generics.CreateAPIView):
     queryset = Question.objects.all()
-    serializer_class = QuestionListCreateSerializer
-
-    def get_queryset(self):
-        return Question.objects.filter(topic__slug=self.kwargs["slug"]).all()
+    serializer_class = QuestionCreateSerializer
 
 
 class QuestionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):

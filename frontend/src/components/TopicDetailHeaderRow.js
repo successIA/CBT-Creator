@@ -1,9 +1,10 @@
 import React from "react";
 import { Row, Col, Button, Icon, Typography } from "antd";
+import { TopicDetail } from "./TopicDetail";
 
 const { Title } = Typography;
 
-export const QuestionListHeaderRow = ({ onAddButtonClick }) => {
+export const TopicDetailHeaderRow = ({ title, onAddButtonClick }) => {
   return (
     <div>
       <Row
@@ -17,7 +18,7 @@ export const QuestionListHeaderRow = ({ onAddButtonClick }) => {
             level={3}
             style={{ marginBottom: 0, verticalAlign: "text-bottom" }}
           >
-            Question List
+            {title}
           </Title>
         </Col>
         <Col>

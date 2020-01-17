@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Layout } from "antd";
 import { TopicList } from "./components/TopicList";
-import { QuestionList } from "./components/QuestionList";
+import { TopicDetail } from "./components/TopicDetail";
 import "antd/dist/antd.css";
 import "./App.css";
 
@@ -23,11 +23,7 @@ function App() {
           <Content>
             <Switch>
               <Route exact path="/" component={TopicList} />
-              <Route
-                exact
-                path="/auth/topics/:slug/"
-                component={QuestionList}
-              />
+              <Route exact path="/auth/topics/:slug/" component={TopicDetail} />
             </Switch>
           </Content>
         </Router>
