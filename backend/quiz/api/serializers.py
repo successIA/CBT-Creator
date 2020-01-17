@@ -127,11 +127,15 @@ class QuestionRetrieveUpdateDestroySerializer(serializers.ModelSerializer):
 
     def _perform_choice_bulk_update(self, instance, choice_data_list):
         choice_data_list = [ch for ch in choice_data_list if ch.get("id")]
-        choice_list = [
-            Choice(question=instance, **choice_data) for choice_data in choice_data_list
-        ]
-        Choice.objects.bulk_update(choice_list, ["body", "is_answer"])
-
+        if choice_data_list:
+            choice_list = [
+                Choice(question=instance, **choice_data)
+                for choice_data in choice_data_list
+            ]
+            Choice.objects.bulk_update(choice_list, ["body", "is_answer"])
+        else:
+            instance.choices.all().delete() # the question type have been changed
+    
     def update(self, instance, validated_data):
         with transaction.atomic():
             instance.body = validated_data["body"]
