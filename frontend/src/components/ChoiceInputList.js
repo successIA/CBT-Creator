@@ -64,7 +64,7 @@ export const ChoiceInputList = ({
           type="danger"
           size="small"
           style={{ marginLeft: 8 }}
-          onClick={() => onChoiceDelete(i)}
+          onClick={() => onChoiceDelete(i, question.choices[i])}
         >
           <Icon type="delete" />
         </Button>

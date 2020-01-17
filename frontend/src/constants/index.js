@@ -4,3 +4,4 @@ export const BASE_QUESTION_LIST_URL = `${BASE_API_URL}auth/topics/`;
 export const BASE_QUESTION_CREATE_URL = `${BASE_API_URL}auth/topics/`;
 export const BASE_QUESTION_UPDATE_URL = `${BASE_API_URL}auth/questions/`;
 export const BASE_QUESTION_DELETE_URL = `${BASE_API_URL}auth/questions/`;
+export const BASE_CHOICE_DELETE_URL = `${BASE_API_URL}auth/choices/`;

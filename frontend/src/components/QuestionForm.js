@@ -12,7 +12,8 @@ export const QuestionForm = ({
   questionToEdit,
   visible,
   onHideForm,
-  onSubmitSuccess
+  onSubmitSuccess,
+  onChoiceDeleteSuccess
 }) => {
   let initialSingleTypeQuestion = {
     topic: slug,
@@ -167,7 +168,6 @@ export const QuestionForm = ({
   const updateQuestion = newQuestion => {
     setQuestionSubmitLoading(true);
     const url = `${Constants.BASE_QUESTION_UPDATE_URL}${newQuestion.id}/`;
-    console.log(url);
     axios
       .put(url, newQuestion, {
         headers: {
@@ -176,7 +176,6 @@ export const QuestionForm = ({
       })
       .then(res => {
         onSubmitSuccess(res.data, setQuestionSubmitLoading);
-        resetForm();
         onHideForm();
       })
       .catch(err => {
@@ -196,17 +195,13 @@ export const QuestionForm = ({
       })
       .then(res => {
         onSubmitSuccess(res.data, setQuestionSubmitLoading);
-        resetForm();
+        setChoiceCount(initialChoiceCount);
+        setQuestion(initialQuestion);
       })
       .catch(err => {
         setQuestionSubmitLoading(false);
         message.error("Something went wrong");
       });
-  };
-
-  const resetForm = () => {
-    setChoiceCount(initialChoiceCount);
-    setQuestion(initialQuestion);
   };
 
   const handleQuestionBodyChange = e => {
@@ -249,11 +244,23 @@ export const QuestionForm = ({
     setQuestion(newQuestion);
   };
 
-  const handleChoiceDelete = index => {
+  const handleChoiceDelete = (index, choiceToDelete = null) => {
     if (question.choices.length === MINIMUM_CHOICE_COUNT) {
       message.error("A question should have at least two choices");
       return;
     }
+    if (choiceToDelete && choiceToDelete.id > 0) {
+      const url = `${Constants.BASE_CHOICE_DELETE_URL}${choiceToDelete.id}`;
+      axios
+        .delete(url)
+        .then(res => removeChoiceFromQuestionChoices(index, choiceToDelete))
+        .catch(err => message.error("Something went wrong"));
+    } else {
+      removeChoiceFromQuestionChoices(index);
+    }
+  };
+
+  const removeChoiceFromQuestionChoices = (index, choiceToDelete = null) => {
     const newQuestion = { ...question };
     const newChoices = newQuestion.choices.filter((choice, i) => {
       if (i === index) {
@@ -264,6 +271,9 @@ export const QuestionForm = ({
     });
     newQuestion.choices = newChoices;
     setQuestion(newQuestion);
+    if (choiceToDelete) {
+      onChoiceDeleteSuccess(newQuestion);
+    }
   };
 
   return (

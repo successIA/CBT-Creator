@@ -37,6 +37,16 @@ export const QuestionList = props => {
   };
 
   const handleQuestionUpdate = (questionToEdit, setQuestionSubmitLoading) => {
+    updateQuestion(questionToEdit);
+    message.success("Question Updated Successfully!");
+    setQuestionSubmitLoading(false);
+  };
+
+  const handleQuestionChoiceDelete = questionToEdit => {
+    updateQuestion(questionToEdit);
+  };
+
+  const updateQuestion = questionToEdit => {
     const newQuestions = questions.map(question => {
       if (question.id === questionToEdit.id) {
         question = questionToEdit;
@@ -44,8 +54,6 @@ export const QuestionList = props => {
       return question;
     });
     setQuestions(newQuestions);
-    setQuestionSubmitLoading(false);
-    message.success("Question Updated Successfully!");
   };
 
   const handleQuestionDelete = questionToDelete => {
@@ -92,6 +100,9 @@ export const QuestionList = props => {
                 onHideForm={hideQuestionForm}
                 onSubmitSuccess={
                   questionToEdit ? handleQuestionUpdate : handleQuestionAdd
+                }
+                onChoiceDeleteSuccess={
+                  questionToEdit ? handleQuestionChoiceDelete : null
                 }
               />
             ) : null}
