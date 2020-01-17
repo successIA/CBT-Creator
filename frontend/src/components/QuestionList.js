@@ -48,6 +48,20 @@ export const QuestionList = props => {
     message.success("Question Updated Successfully!");
   };
 
+  const handleQuestionDelete = questionToDelete => {
+    const url = `${Constants.BASE_QUESTION_DELETE_URL}${questionToDelete.id}`;
+    axios
+      .delete(url)
+      .then(res => {
+        message.success("Question deleted successfully");
+        const newQuestions = questions.filter(question => {
+          return question.id !== questionToDelete.id;
+        });
+        setQuestions(newQuestions);
+      })
+      .catch(err => message.error("Something went wrong"));
+  };
+
   const hideQuestionForm = () => {
     setQuestionToEdit(null);
     setQuestionFormVisible(false);
@@ -66,6 +80,7 @@ export const QuestionList = props => {
                 key={question.id}
                 question={question}
                 onEditClick={setQuestionToEdit}
+                onDeleteClick={handleQuestionDelete}
               />
             ))}
 

@@ -1,10 +1,10 @@
 import React from "react";
-import { Card, Row, Col, Button, Typography, Icon } from "antd";
+import { Card, Row, Col, Button, Typography, Icon, Popconfirm } from "antd";
 import { ChoiceList } from "./ChoiceList";
 
 const { Text } = Typography;
 
-export const QuestionDetail = ({ question, onEditClick }) => {
+export const QuestionDetail = ({ question, onEditClick, onDeleteClick }) => {
   return (
     <div>
       <Card
@@ -24,6 +24,16 @@ export const QuestionDetail = ({ question, onEditClick }) => {
               <Icon type="edit" />
               Edit
             </Button>
+            <Popconfirm
+              title="Are you sure"
+              icon={<Icon type="question-circle-o" style={{ color: "red" }} />}
+              onConfirm={() => onDeleteClick(question)}
+            >
+              <Button type="danger" style={{ marginLeft: 8 }}>
+                <Icon type="delete" />
+                Delete
+              </Button>
+            </Popconfirm>
           </Col>
         </Row>
       </Card>
