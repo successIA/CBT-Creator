@@ -1,48 +1,66 @@
 import React from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
-import { Row, Col, Typography, Card, message } from "antd";
-import * as Constants from "../constants";
+import { Row, Col, Typography, Card, Spin, message } from "antd";
+import { TopicContext } from "../contexts/TopicContext";
+import { TopicForm } from "./TopicForm";
+import { TopicListHeaderRow } from "./TopicListHeaderRow";
+import { getTopics } from "../actions/topics";
 
 const { Title, Text } = Typography;
 
 export const TopicList = () => {
-  const [topics, setTopics] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [topicFormVisible, setTopicFormVisible] = React.useState(false);
+  const { topicState } = React.useContext(TopicContext);
+  const { topicDispatch } = React.useContext(TopicContext);
 
-  if (!topics.length) {
-    const url = `${Constants.BASE_API_URL}auth/`;
-    axios
-      .get(url)
-      .then(res => {
-        console.log(res.data);
-        setTopics(res.data);
-      })
-      .catch(err => message.error("Something went wrong"));
+  const onGetTopicsSuccess = () => {
+    setLoading(false);
+  };
+
+  const onGetTopicsFailure = error => {
+    message.error("Something went wrong");
+    setLoading(false);
+  };
+
+  if (!topicState.topics.length) {
+    getTopics(topicDispatch, onGetTopicsSuccess, onGetTopicsFailure);
   }
 
-  console.log(topics);
   return (
-    <Row gutter={16}>
-      <Col span={8} offset={4}>
-        <h1 style={{ marginBottom: 16 }}>Topic List</h1>
-        {topics.map(topic => (
-          <Card
-            key={topic.slug}
-            bordered={false}
-            hoverable
-            style={{
-              width: 900,
-              background: "#fff",
-              marginBottom: 16
-            }}
-          >
-            <Title level={2}>
-              <Link to={`/auth/topics/${topic.slug}/`}>{topic.title}</Link>
-            </Title>
-            <Text type="secondary">Lorem ipsum dalor</Text>
-          </Card>
-        ))}
-      </Col>
-    </Row>
+    <div>
+      {!topicState.topics.length && loading ? (
+        <div className="spinner-wrapper">
+          <Spin size="large" />
+        </div>
+      ) : (
+        <Row gutter={16}>
+          <Col span={8} offset={4}>
+            <TopicListHeaderRow onAddButtonClick={setTopicFormVisible} />
+            {topicState.topics.map(topic => (
+              <Card
+                key={topic.slug}
+                bordered={false}
+                hoverable
+                style={{
+                  width: 900,
+                  background: "#fff",
+                  marginBottom: 16
+                }}
+              >
+                <Title level={2}>
+                  <Link to={`/auth/topics/${topic.slug}/`}>{topic.title}</Link>
+                </Title>
+                <Text type="secondary">Lorem ipsum dalor</Text>
+              </Card>
+            ))}
+            <TopicForm
+              visible={topicFormVisible}
+              setFormVisible={setTopicFormVisible}
+            />
+          </Col>
+        </Row>
+      )}
+    </div>
   );
 };

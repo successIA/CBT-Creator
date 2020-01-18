@@ -6,15 +6,7 @@ import { QuestionDetail } from "./QuestionDetail";
 import { TopicDetailHeaderRow } from "./TopicDetailHeaderRow";
 import * as Constants from "../constants";
 
-const spinnerStyle = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "rgba(0, 0, 0, 0.05)",
-  height: "90vh"
-};
-
-export const TopicDetail = props => {
+export const ThreadDetail = props => {
   const [title, setTitle] = React.useState("");
   const [questions, setQuestions] = React.useState([]);
   const [questionFormVisible, setQuestionFormVisible] = React.useState(false);
@@ -23,7 +15,6 @@ export const TopicDetail = props => {
   if (Array.isArray(questions) && !questions.length) {
     const slug = props.match.params.slug;
     const url = `${Constants.BASE_TOPIC_DETAIL_URL}${slug}/`;
-
     axios
       .get(url)
       .then(res => {
@@ -80,9 +71,11 @@ export const TopicDetail = props => {
   };
 
   return (
-    <div style={!questions.length ? spinnerStyle : null}>
+    <div>
       {!questions.length ? (
-        <Spin size="large" />
+        <div className="spinner-wrapper">
+          <Spin size="large" />
+        </div>
       ) : (
         <Row>
           <Col span={12} offset={2}>

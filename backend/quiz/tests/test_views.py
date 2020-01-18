@@ -66,7 +66,6 @@ class TopicRetrieveUpdateDestroyViewTest(APITestCase):
     def test_update(self):
         post_data = {"slug": self.topic.slug, "title": "Python Decorators"}
         response = self.client.put(self.detail_edit_delete_url, post_data)
-        print(response.json())
         self.assertEqual(response.status_code, 200)
         read_data = json.loads(response.content)
         expected_data = {
