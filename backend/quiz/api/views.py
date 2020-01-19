@@ -8,18 +8,27 @@ from rest_framework.views import APIView
 from ..models import Choice, Question, Topic
 from ..utils import get_real_question, is_correct_answer
 from .serializers import (
-    ChoiceListSerializer,
+    ChoiceSerializer,
     QuestionCreateSerializer,
     QuestionListSerializer,
     QuestionRetrieveUpdateDestroySerializer,
-    # TopicListSerializer,
-    TopicSerializer,
+    TopicListSerializer,
+    TopicListCreateSerializer,
+    TopicDetailSerializer,
 )
 
 
-# class TopicListView(generics.ListAPIView):
-#     queryset = Topic.objects.all()
-# serializer_class = TopicListSerializer
+class TopicListView(generics.ListAPIView):
+    queryset = Topic.objects.all()
+    serializer_class = TopicListSerializer
+
+
+class QuestionListView(generics.ListAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionListSerializer
+
+    def get_queryset(self):
+        return Question.objects.filter(topic__slug=self.kwargs["slug"]).all()
 
 
 class ScoreRetreiveView(APIView):
@@ -53,30 +62,19 @@ class ScoreRetreiveView(APIView):
 
 class TopicListCreateView(generics.ListCreateAPIView):
     queryset = Topic.objects.all()
-    serializer_class = TopicSerializer
+    serializer_class = TopicListCreateSerializer
 
 
 class TopicRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Topic.objects.all()
-    serializer_class = TopicSerializer
+    serializer_class = TopicDetailSerializer
     lookup_field = "slug"
     lookup_url_kwarg = "slug"
 
 
-class QuestionCreateView(generics.ListCreateAPIView):
+class QuestionCreateView(generics.CreateAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionCreateSerializer
-
-
-class QuestionListView(generics.ListCreateAPIView):
-    queryset = Question.objects.all()
-    serializer_class = QuestionListSerializer
-
-    def get_queryset(self):
-        if self.kwargs.get("slug"):
-            return Question.objects.filter(topic__slug=self.kwargs["slug"]).all()
-        else:
-            return Question.objects.all()
 
 
 class QuestionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -86,4 +84,4 @@ class QuestionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 class ChoiceDestroyView(generics.DestroyAPIView):
     queryset = Choice.objects.all()
-    serializer_class = ChoiceListSerializer
+    serializer_class = ChoiceSerializer
