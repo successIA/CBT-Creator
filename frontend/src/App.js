@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Layout } from "antd";
 import { TopicList } from "./components/TopicList";
-import { ThreadDetail } from "./components/ThreadDetail";
+import { TopicDetail } from "./components/TopicDetail";
 import { TopicContextProvider } from "./contexts/TopicContext";
 import "antd/dist/antd.css";
 import "./App.css";
@@ -28,7 +28,7 @@ function App() {
                 <Route
                   exact
                   path="/auth/topics/:slug/"
-                  component={ThreadDetail}
+                  component={TopicDetail}
                 />
               </Switch>
             </Content>

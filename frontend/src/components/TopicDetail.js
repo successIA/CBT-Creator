@@ -6,7 +6,7 @@ import { QuestionDetail } from "./QuestionDetail";
 import { TopicDetailHeaderRow } from "./TopicDetailHeaderRow";
 import * as Constants from "../constants";
 
-export const ThreadDetail = props => {
+export const TopicDetail = props => {
   const [title, setTitle] = React.useState("");
   const [questions, setQuestions] = React.useState([]);
   const [questionFormVisible, setQuestionFormVisible] = React.useState(false);
@@ -51,6 +51,11 @@ export const ThreadDetail = props => {
     setQuestions(newQuestions);
   };
 
+  const handleQuestionEdit = question => {
+    const newQuestion = { ...question, choices: [...question.choices] };
+    setQuestionToEdit(newQuestion);
+  };
+
   const handleQuestionDelete = questionToDelete => {
     const url = `${Constants.BASE_QUESTION_DELETE_URL}${questionToDelete.id}`;
     axios
@@ -87,7 +92,7 @@ export const ThreadDetail = props => {
               <QuestionDetail
                 key={question.id}
                 question={question}
-                onEditClick={setQuestionToEdit}
+                onEditClick={handleQuestionEdit}
                 onDeleteClick={handleQuestionDelete}
               />
             ))}
