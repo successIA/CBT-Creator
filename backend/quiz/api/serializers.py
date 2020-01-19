@@ -5,20 +5,20 @@ from rest_framework import serializers
 from ..models import Choice, Question, Topic
 
 
-class TopicListSerializer(serializers.HyperlinkedModelSerializer):
-    question_list_url = serializers.HyperlinkedIdentityField(
-        view_name="question-list",
-        lookup_field="slug",
-        lookup_url_kwarg="slug",
-        read_only=True,
-    )
+# class TopicListSerializer(serializers.HyperlinkedModelSerializer):
+#     question_list_url = serializers.HyperlinkedIdentityField(
+#         view_name="question-list",
+#         lookup_field="slug",
+#         lookup_url_kwarg="slug",
+#         read_only=True,
+#     )
 
-    class Meta:
-        model = Topic
-        fields = ["title", "question_list_url"]
+#     class Meta:
+#         model = Topic
+#         fields = ["title", "question_list_url"]
 
 
-class ChoiceSerializer(serializers.ModelSerializer):
+class ChoiceListSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=False, write_only=False, required=False)
 
     class Meta:
@@ -31,19 +31,31 @@ class QuestionListSerializer(serializers.ModelSerializer):
     topic = serializers.SlugRelatedField(
         slug_field="slug", queryset=Topic.objects.all()
     )
-    choices = ChoiceSerializer(many=True)
+    choices = ChoiceListSerializer(many=True)
+    url = serializers.HyperlinkedIdentityField(
+        view_name="question-detail-edit-delete",
+        lookup_field="pk",
+        lookup_url_kwarg="pk",
+        read_only=True,
+    )
 
     class Meta:
         model = Question
-        fields = ["topic", "id", "body", "question_type", "choices"]
+        fields = ["topic", "id", "body", "question_type", "choices", "url"]
 
     def get_choices(self):
         choice_data_list = self.validated_data.pop("choices")
         return [Choice(**data) for data in choice_data_list]
 
 
-class TopicListCreateSerializer(serializers.HyperlinkedModelSerializer):
+class TopicSerializer(serializers.HyperlinkedModelSerializer):
     slug = serializers.SlugField(read_only=True)
+    question_list_url = serializers.HyperlinkedIdentityField(
+        view_name="question-list",
+        lookup_field="slug",
+        lookup_url_kwarg="slug",
+        read_only=True,
+    )
     url = serializers.HyperlinkedIdentityField(
         view_name="topic-detail-edit-delete",
         lookup_field="slug",
@@ -53,21 +65,7 @@ class TopicListCreateSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Topic
-        fields = ["slug", "title", "url"]
-
-
-class TopicDetailSerializer(serializers.HyperlinkedModelSerializer):
-    questions = QuestionListSerializer(many=True, read_only=True)
-    url = serializers.HyperlinkedIdentityField(
-        view_name="topic-detail-edit-delete",
-        lookup_field="slug",
-        lookup_url_kwarg="slug",
-        read_only=True,
-    )
-
-    class Meta:
-        model = Topic
-        fields = ["slug", "title", "questions", "url"]
+        fields = ["slug", "title", "question_list_url", "url"]
 
 
 class ChoiceCreateSerializer(serializers.ModelSerializer):
@@ -108,7 +106,7 @@ class QuestionRetrieveUpdateDestroySerializer(serializers.ModelSerializer):
     topic = serializers.SlugRelatedField(
         slug_field="slug", queryset=Topic.objects.all()
     )
-    choices = ChoiceSerializer(many=True)
+    choices = ChoiceListSerializer(many=True)
     url = serializers.HyperlinkedIdentityField(
         view_name="question-detail-edit-delete",
         lookup_field="pk",

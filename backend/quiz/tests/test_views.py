@@ -22,7 +22,7 @@ class TopicListBaseTestView(APITestCase):
 class TopicListViewTest(TopicListBaseTestView):
     def setUp(self):
         super().setUp()
-        self.topic_list_url = reverse("topic-list")
+        self.topic_list_url = reverse("topic-list-create")
 
     def test_list(self):
         response = self.client.get(self.topic_list_url)
@@ -45,6 +45,7 @@ class TopicListCreateViewTest(TopicListBaseTestView):
         expected_data = {
             "slug": "python-decorators",
             "title": "Python Decorators",
+            "question_list_url": "http://testserver/auth/topics/python-decorators/questions/",
             "url": "http://testserver/auth/topics/python-decorators/",
         }
         self.assertEqual(read_data, expected_data)
@@ -71,7 +72,7 @@ class TopicRetrieveUpdateDestroyViewTest(APITestCase):
         expected_data = {
             "slug": "python-decorators",
             "title": "Python Decorators",
-            "questions": [],
+            "question_list_url": "http://testserver/auth/topics/python-decorators/questions/",
             "url": "http://testserver/auth/topics/python-decorators/",
         }
         self.assertEqual(read_data, expected_data)
@@ -141,9 +142,7 @@ class QuestionListTest(QuestionViewBaseTest):
 class QuestionCreateTest(QuestionViewBaseTest):
     def setUp(self):
         super().setUp()
-        self.question_create_url = reverse(
-            "question-create"
-        )
+        self.question_list_url = reverse("question-create")
         
     def test_create(self):
         previous_count = Question.objects.count()
@@ -162,7 +161,7 @@ class QuestionCreateTest(QuestionViewBaseTest):
                 }
             ]
         }
-        response = self.client.post(self.question_create_url, post_data, format="json")
+        response = self.client.post(self.question_list_url, post_data, format="json")
         self.assertEqual(response.status_code, 201)
         read_data = json.loads(response.content)
         expected_data = {

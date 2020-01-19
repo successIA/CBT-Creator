@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from .views import (
     ChoiceDestroyView,
@@ -7,37 +7,28 @@ from .views import (
     QuestionRetrieveUpdateDestroyView,
     ScoreRetreiveView,
     TopicListCreateView,
-    TopicListView,
+    # TopicListView,
     TopicRetrieveUpdateDestroyView,
 )
 
 urlpatterns = [
     # PUBLIC ROUTES
-    path("", TopicListView.as_view(), name="topic-list"),
-    path("topics/<slug:slug>/", QuestionListView.as_view(), name="question-list",),
+    # path("", TopicListView.as_view(), name="topic-list"),
+    # path("topics/<slug:slug>/", QuestionListView.as_view(), name="question-list",),
     path("topics/<slug:slug>/result/", ScoreRetreiveView.as_view(), name="result"),
     # AUTH ROUTES
     path("auth/", TopicListCreateView.as_view(), name="topic-list-create"),
-    # path(
-    #     "auth/topics/<slug:slug>/edit/",
-    #     TopicRetrieveUpdateDestroyView.as_view(),
-    #     name="topic-detail-edit-delete",
-    # ),
     path(
         "auth/topics/<slug:slug>/",
         TopicRetrieveUpdateDestroyView.as_view(),
         name="topic-detail-edit-delete",
     ),
     path(
-        "auth/questions/",
-        QuestionCreateView.as_view(),
-        name="question-create",
+        "auth/topics/<slug:slug>/questions/",
+        QuestionListView.as_view(),
+        name="question-list",
     ),
-    # path(
-    #     "auth/topics/<slug:slug>/questions/",
-    #     QuestionListCreateView.as_view(),
-    #     name="question-list-create",
-    # ),
+    path("auth/questions/", QuestionCreateView.as_view(), name="question-create"),
     path(
         "auth/questions/<int:pk>/",
         QuestionRetrieveUpdateDestroyView.as_view(),
