@@ -23,12 +23,11 @@ class TopicListView(generics.ListAPIView):
     serializer_class = TopicListSerializer
 
 
-class QuestionListView(generics.ListAPIView):
-    queryset = Question.objects.all()
-    serializer_class = QuestionListSerializer
-
-    def get_queryset(self):
-        return Question.objects.filter(topic__slug=self.kwargs["slug"]).all()
+class TopicDetailView(generics.ListAPIView):
+    queryset = Topic.objects.all()
+    serializer_class = TopicDetailSerializer
+    lookup_field = "slug"
+    lookup_url_kwarg = "slug"
 
 
 class ScoreRetreiveView(APIView):

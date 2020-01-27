@@ -135,15 +135,15 @@ class QuestionViewBaseTest(APITestCase):
         self.assertContains(response, "A list is passed by reference")
 
 
-class QuestionListTest(QuestionViewBaseTest):
+class TopicDetailViewTest(QuestionViewBaseTest):
     def setUp(self):
         super().setUp()
-        self.question_list_url = reverse(
-            "question-list", kwargs={"slug": self.topic.slug}
+        self.detail_url = reverse(
+            "topic-detail", kwargs={"slug": self.topic.slug}
         )
 
     def test_list(self):
-        response = self.client.get(self.question_list_url)
+        response = self.client.get(self.detail_url)
         self.assert_questions_content(response)
 
 

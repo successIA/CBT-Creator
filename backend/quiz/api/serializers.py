@@ -6,8 +6,8 @@ from ..models import Choice, Question, Topic
 
 
 class TopicListSerializer(serializers.HyperlinkedModelSerializer):
-    question_list_url = serializers.HyperlinkedIdentityField(
-        view_name="question-list",
+    detail_url = serializers.HyperlinkedIdentityField(
+        view_name="topic-detail",
         lookup_field="slug",
         lookup_url_kwarg="slug",
         read_only=True,
@@ -15,7 +15,7 @@ class TopicListSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Topic
-        fields = ["title", "question_list_url"]
+        fields = ["title", "detail_url"]
 
 
 class ChoiceSerializer(serializers.ModelSerializer):

@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     ChoiceDestroyView,
     QuestionCreateView,
-    QuestionListView,
+    TopicDetailView,
     QuestionRetrieveUpdateDestroyView,
     ScoreRetreiveView,
     TopicListCreateView,
@@ -14,7 +14,7 @@ from .views import (
 urlpatterns = [
     # PUBLIC ROUTES
     path("", TopicListView.as_view(), name="topic-list"),
-    path("topics/<slug:slug>/", QuestionListView.as_view(), name="question-list"),
+    path("topics/<slug:slug>/", TopicDetailView.as_view(), name="topic-detail"),
     path("topics/<slug:slug>/result/", ScoreRetreiveView.as_view(), name="result"),
     # AUTH ROUTES
     path("auth/", TopicListCreateView.as_view(), name="topic-list-create"),
