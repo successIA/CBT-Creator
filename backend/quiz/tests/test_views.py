@@ -6,7 +6,6 @@ from rest_framework.test import APITestCase
 
 from ..models import Choice, Question, Topic
 
-# self.client = APIself.Client()
 
 class TopicListBaseTestView(APITestCase):
     def setUp(self):
@@ -28,11 +27,12 @@ class TopicListViewTest(TopicListBaseTestView):
         response = self.client.get(self.topic_list_url)
         self.assert_topic_list_reponse(response)
 
+
 class TopicListCreateViewTest(TopicListBaseTestView):
     def setUp(self):
         super().setUp()
         self.topic_list_create_url = reverse("topic-list-create")
-    
+
     def test_list(self):
         response = self.client.get(self.topic_list_create_url)
         self.assert_topic_list_reponse(response)
@@ -84,11 +84,14 @@ class TopicRetrieveUpdateDestroyViewTest(APITestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEquals(Topic.objects.count(), 0)
 
+
 class QuestionViewBaseTest(APITestCase):
     def setUp(self):
-        self.topic = Topic.objects.create(title="Python Data Types")        
+        self.topic = Topic.objects.create(title="Python Data Types")
         self.question = Question.objects.create(
-            topic=self.topic, body="Which of the is an integer in python?", question_type="single"
+            topic=self.topic,
+            body="Which of the is an integer in python?",
+            question_type="single"
         )
         self.question_ch = Choice.objects.create(
             question=self.question, body="-2", is_answer=True
@@ -96,8 +99,8 @@ class QuestionViewBaseTest(APITestCase):
         self.question_ch2 = Choice.objects.create(question=self.question, body="2.0")
 
         self.question2 = Question.objects.create(
-            topic=self.topic, 
-            body="Select the choices that define a list correctly in python?", 
+            topic=self.topic,
+            body="Select the choices that define a list correctly in python?",
             question_type="multiple"
         )
         self.question2_ch = Choice.objects.create(
@@ -107,32 +110,38 @@ class QuestionViewBaseTest(APITestCase):
             question=self.question2, body="A list is mutable", is_answer=True
         )
         self.question2_ch3 = Choice.objects.create(
-            question=self.question2, body="A list is passed by reference", is_answer=True
+            question=self.question2,
+            body="A list is passed by reference",
+            is_answer=True
         )
 
-    def assert_questions_content(self, response):        
+    def assert_questions_content(self, response):
         self.assertEqual(response.status_code, 200)
         self.assert_first_question_context(response)
         self.assert_second_question_context(response)
 
     def assert_first_question_context(self, response):
-        # self.assertContains(response, "Python Data Types")
         self.assertContains(response, "Which of the is an integer in python?")
         self.assertContains(response, "-2")
         self.assertContains(response, "2.0")
-        
-    def assert_second_question_context(self, response):        
-        # self.assertContains("Select the choices that define a list correctly in python?")
+
+    def assert_second_question_context(self, response):
+        self.assertContains(
+            response,
+            "Select the choices that define a list correctly in python?"
+        )
         self.assertContains(response, "A list is immutable")
-        self.assertContains(response, "A list is mutable")        
+        self.assertContains(response, "A list is mutable")
         self.assertContains(response, "A list is passed by reference")
 
 
 class QuestionListTest(QuestionViewBaseTest):
     def setUp(self):
         super().setUp()
-        self.question_list_url = reverse("question-list", kwargs={"slug": self.topic.slug})
-        
+        self.question_list_url = reverse(
+            "question-list", kwargs={"slug": self.topic.slug}
+        )
+
     def test_list(self):
         response = self.client.get(self.question_list_url)
         self.assert_questions_content(response)
@@ -144,7 +153,7 @@ class QuestionCreateTest(QuestionViewBaseTest):
         self.question_create_url = reverse(
             "question-create"
         )
-        
+
     def test_create(self):
         previous_count = Question.objects.count()
         post_data = {
@@ -158,7 +167,7 @@ class QuestionCreateTest(QuestionViewBaseTest):
                 },
                 {
                     "body": "choice 2",
-                    "is_answer": "false"   			
+                    "is_answer": "false"
                 }
             ]
         }
@@ -183,18 +192,18 @@ class QuestionCreateTest(QuestionViewBaseTest):
                 }
             ],
             "url": "http://testserver/auth/questions/3/"
-        }        
+        }
         self.assertEqual(read_data, expected_data)
         self.assertEquals(Question.objects.count(), previous_count + 1)
 
-    
+
 class QuestionRetrieveUpdateDestroyViewTest(QuestionViewBaseTest):
     def setUp(self):
         super().setUp()
         self.detail_edit_delete_url = reverse(
             "question-detail-edit-delete", kwargs={"pk": self.question.pk}
         )
- 
+
     def test_detail(self):
         response = self.client.get(self.detail_edit_delete_url)
         self.assertEqual(response.status_code, 200)
@@ -215,16 +224,18 @@ class QuestionRetrieveUpdateDestroyViewTest(QuestionViewBaseTest):
                 {
                     "id": 2,
                     "body": "choice 2 changed",
-                    "is_answer": "true"   			
+                    "is_answer": "true"
                 },
                 {
                     "id": 0,
                     "body": "new choice",
-                    "is_answer": "true"   			
+                    "is_answer": "true"
                 }
             ]
         }
-        response = self.client.put(self.detail_edit_delete_url, post_data, format="json")
+        response = self.client.put(
+            self.detail_edit_delete_url, post_data, format="json"
+        )
         self.assertEqual(response.status_code, 200)
 
         read_data = json.loads(response.content)
@@ -234,7 +245,7 @@ class QuestionRetrieveUpdateDestroyViewTest(QuestionViewBaseTest):
             "body": "Random question changed?",
             "question_type": "multiple",
             "choices": [
-                        {
+                {
                     "id": 1,
                     "body": "choice 1 changed",
                     "is_answer": False
@@ -242,22 +253,22 @@ class QuestionRetrieveUpdateDestroyViewTest(QuestionViewBaseTest):
                 {
                     "id": 2,
                     "body": "choice 2 changed",
-                    "is_answer": True   			
+                    "is_answer": True
                 },
                 {
                     "id": 6,
                     "body": "new choice",
-                    "is_answer": True   			
+                    "is_answer": True
                 }
             ],
             "url": f"http://testserver/auth/questions/{self.question.pk}/"
         }
-        
+
         self.assertEqual(read_data, expected_data)
 
         topic = Topic.objects.get(slug=self.topic.slug)
         self.assertEqual(topic.slug, self.topic.slug)
-        
+
         question = Question.objects.get(pk=self.question.pk)
         self.assertEqual(question.pk, self.question.pk)
         self.assertEqual(question.body, "Random question changed?")
@@ -268,28 +279,27 @@ class QuestionRetrieveUpdateDestroyViewTest(QuestionViewBaseTest):
         self.assertEqual(choices[0].pk, 1)
         self.assertEqual(choices[0].body, "choice 1 changed")
         self.assertEqual(choices[0].is_answer, False)
-        
+
         self.assertEqual(choices[1].pk, 2)
         self.assertEqual(choices[1].body, "choice 2 changed")
         self.assertEqual(choices[1].is_answer, True)
-        
+
         self.assertEqual(choices[2].pk, 6)
         self.assertEqual(choices[2].body, "new choice")
         self.assertEqual(choices[2].is_answer, True)
-        
-        
+
     def test_delete(self):
         previous_count = Question.objects.count()
         response = self.client.delete(self.detail_edit_delete_url)
         self.assertEqual(response.status_code, 204)
-        self.assertEquals( Question.objects.count(), previous_count - 1)
+        self.assertEquals(Question.objects.count(), previous_count - 1)
 
 
 class ChoiceDestroyViewTest(QuestionViewBaseTest):
     def setUp(self):
         super().setUp()
         self.delete_url = reverse("choice-delete", kwargs={"pk": self.question_ch.pk})
-    
+
     def test_delete(self):
         previous_count = self.question.choices.count()
         response = self.client.delete(self.delete_url)
@@ -302,7 +312,7 @@ class ScoreRetreiveView(QuestionViewBaseTest):
     def setUp(self):
         super().setUp()
         self.score_retrieve_url = reverse("result", kwargs={"slug": self.topic.slug})
-    
+
     def test_retrieve_with_only_correct_answers(self):
         post_data = [
             {
@@ -347,7 +357,7 @@ class ScoreRetreiveView(QuestionViewBaseTest):
                 ]
             }
         ]
-        
+
         response = self.client.post(self.score_retrieve_url, post_data, format="json")
         self.assertEqual(response.status_code, 200)
         read_data = json.loads(response.content)
@@ -400,7 +410,7 @@ class ScoreRetreiveView(QuestionViewBaseTest):
                 ]
             }
         ]
-        
+
         response = self.client.post(self.score_retrieve_url, post_data, format="json")
         self.assertEqual(response.status_code, 200)
         read_data = json.loads(response.content)
@@ -453,7 +463,7 @@ class ScoreRetreiveView(QuestionViewBaseTest):
                 ]
             }
         ]
-        
+
         response = self.client.post(self.score_retrieve_url, post_data, format="json")
         self.assertEqual(response.status_code, 200)
         read_data = json.loads(response.content)
@@ -501,7 +511,7 @@ class ScoreRetreiveView(QuestionViewBaseTest):
                 ]
             }
         ]
-        
+
         response = self.client.post(self.score_retrieve_url, post_data, format="json")
         self.assertEqual(response.status_code, 200)
         read_data = json.loads(response.content)
@@ -531,6 +541,6 @@ class ScoreRetreiveView(QuestionViewBaseTest):
                 ]
             }
         ]
-        
+
         response = self.client.post(self.score_retrieve_url, post_data, format="json")
         self.assertEqual(response.status_code, 400)
