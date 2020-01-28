@@ -2,20 +2,7 @@ from django.db import transaction
 
 from rest_framework import serializers
 
-from ..models import Choice, Question, Topic
-
-
-class TopicListSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="topic-detail",
-        lookup_field="slug",
-        lookup_url_kwarg="slug",
-        read_only=True,
-    )
-
-    class Meta:
-        model = Topic
-        fields = ["title", "url"]
+from quiz.models import Choice, Question, Topic
 
 
 class ChoiceSerializer(serializers.ModelSerializer):

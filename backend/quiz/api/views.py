@@ -12,9 +12,9 @@ from .serializers import (
     QuestionCreateSerializer,
     QuestionListSerializer,
     QuestionRetrieveUpdateDestroySerializer,
-    TopicListSerializer,
-    TopicListCreateSerializer,
     TopicDetailSerializer,
+    TopicListCreateSerializer,
+    TopicListSerializer,
 )
 
 
