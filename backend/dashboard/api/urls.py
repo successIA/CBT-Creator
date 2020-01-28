@@ -1,7 +1,6 @@
 from django.urls import path
 
 from .views import (
-    ChoiceDestroyView,
     QuestionCreateView,
     QuestionRetrieveUpdateDestroyView,
     TopicListCreateView,
@@ -20,6 +19,5 @@ urlpatterns = [
         "auth/questions/<int:pk>/",
         QuestionRetrieveUpdateDestroyView.as_view(),
         name="question-detail-edit-delete",
-    ),
-    path("auth/choices/<int:pk>/", ChoiceDestroyView.as_view(), name="choice-delete"),
+    )
 ]

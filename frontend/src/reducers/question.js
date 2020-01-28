@@ -2,8 +2,7 @@ import * as actionTypes from "../actions/types";
 
 const initialState = {
   isSubmitting: false,
-  saveSuccess: false,
-  deletedChoiceId: null
+  saveSuccess: false
 };
 
 const question = (state = initialState, action) => {
@@ -12,8 +11,7 @@ const question = (state = initialState, action) => {
       return {
         ...state,
         isSubmitting: true,
-        saveSuccess: false,
-        deletedChoiceId: null
+        saveSuccess: false
       };
     case actionTypes.CREATE_QUESTION_SUCCESS:
       return {
@@ -27,8 +25,7 @@ const question = (state = initialState, action) => {
       return {
         ...state,
         isSubmitting: true,
-        saveSuccess: false,
-        deletedChoiceId: null
+        saveSuccess: false
       };
     case actionTypes.UPDATE_QUESTION_SUCCESS:
       return {
@@ -45,17 +42,6 @@ const question = (state = initialState, action) => {
         ...state,
         isSubmitting: false,
         saveSuccess: false
-      };
-    case actionTypes.DELETE_CHOICE_REQUEST:
-    case actionTypes.DELETE_CHOICE_FAILURE:
-      return {
-        ...state,
-        deletedChoiceId: null
-      };
-    case actionTypes.DELETE_CHOICE_SUCCESS:
-      return {
-        ...state,
-        deletedChoiceId: action.payload
       };
     default:
       return state;

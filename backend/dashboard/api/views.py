@@ -1,9 +1,8 @@
 from rest_framework import generics
 
-from quiz.models import Choice, Question, Topic
+from quiz.models import Question, Topic
 
 from .serializers import (
-    ChoiceSerializer,
     QuestionCreateSerializer,
     QuestionRetrieveUpdateDestroySerializer,
     TopicDetailSerializer,
@@ -31,8 +30,3 @@ class QuestionCreateView(generics.CreateAPIView):
 class QuestionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionRetrieveUpdateDestroySerializer
-
-
-class ChoiceDestroyView(generics.DestroyAPIView):
-    queryset = Choice.objects.all()
-    serializer_class = ChoiceSerializer

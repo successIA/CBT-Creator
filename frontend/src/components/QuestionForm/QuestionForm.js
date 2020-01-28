@@ -22,13 +22,6 @@ export default class QuestionForm extends React.Component {
     this.multipleTypeQuestionState = this.props.multipleTypeQuestion;
   }
 
-  componentDidUpdate(prevProps) {
-    const deletedChoiceId = this.props.deletedChoiceId;
-    if (deletedChoiceId && deletedChoiceId !== prevProps.deletedChoiceId) {
-      this.deleteChoiceById(deletedChoiceId);
-    }
-  }
-
   handleBodyChange = e => {
     this.setState({
       [e.target.name]: e.target.value
@@ -87,18 +80,8 @@ export default class QuestionForm extends React.Component {
       return;
     }
 
-    if (choiceToDelete.id) {
-      this.props.onChoiceDelete(choiceToDelete);
-    } else {
-      this.setState({
-        choices: this.state.choices.filter((choice, i) => i !== index)
-      });
-    }
-  };
-
-  deleteChoiceById = id => {
     this.setState({
-      choices: this.state.choices.filter(choice => choice.id !== id)
+      choices: this.state.choices.filter((choice, i) => i !== index)
     });
   };
 

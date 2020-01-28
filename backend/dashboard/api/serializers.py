@@ -107,6 +107,28 @@ class QuestionRetrieveUpdateDestroySerializer(serializers.ModelSerializer):
         model = Question
         fields = ["topic", "id", "body", "question_type", "choices", "url"]
 
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            instance.body = validated_data["body"]
+            instance.question_type = validated_data["question_type"]
+            instance.save(update_fields=["body", "question_type"])
+            choice_data_list = validated_data["choices"]
+            self._perform_orphaned_choice_delete(instance, choice_data_list)
+            self._perform_choice_bulk_update(instance, choice_data_list)
+            self._perform_choice_bulk_create(instance, choice_data_list)
+        return instance
+
+    def _perform_choice_bulk_update(self, instance, choice_data_list):
+        choice_data_list = [ch for ch in choice_data_list if ch.get("id")]
+        if choice_data_list:
+            choice_list = [
+                Choice(question=instance, **choice_data)
+                for choice_data in choice_data_list
+            ]
+            Choice.objects.bulk_update(choice_list, ["body", "is_answer"])
+        # else:
+        #     instance.choices.all().delete()  # the question type have been changed
+
     def _perform_choice_bulk_create(self, instance, choice_data_list):
         choice_data_list = [ch for ch in choice_data_list if not ch.get("id")]
 
@@ -120,23 +142,10 @@ class QuestionRetrieveUpdateDestroySerializer(serializers.ModelSerializer):
         ]
         Choice.objects.bulk_create(choice_list)
 
-    def _perform_choice_bulk_update(self, instance, choice_data_list):
-        choice_data_list = [ch for ch in choice_data_list if ch.get("id")]
-        if choice_data_list:
-            choice_list = [
-                Choice(question=instance, **choice_data)
-                for choice_data in choice_data_list
-            ]
-            Choice.objects.bulk_update(choice_list, ["body", "is_answer"])
-        else:
-            instance.choices.all().delete()  # the question type have been changed
-
-    def update(self, instance, validated_data):
-        with transaction.atomic():
-            instance.body = validated_data["body"]
-            instance.question_type = validated_data["question_type"]
-            instance.save(update_fields=["body", "question_type"])
-            choice_data_list = validated_data["choices"]
-            self._perform_choice_bulk_update(instance, choice_data_list)
-            self._perform_choice_bulk_create(instance, choice_data_list)
-        return instance
+    def _perform_orphaned_choice_delete(self, instance, choice_data_list):
+        all_choice_ids = {ch.pk for ch in instance.choices.all()}
+        choice_id_data = {ch["id"] for ch in choice_data_list if ch.get("id")}
+        orphaned_choice_ids = all_choice_ids - choice_id_data
+        Choice.objects.filter(
+            question__pk=instance.pk, pk__in=orphaned_choice_ids
+        ).delete()

@@ -90,33 +90,3 @@ export const deleteQuestion = (id, topic_slug) => {
       });
   };
 };
-
-export const deleteChoiceRequest = () => ({
-  type: actionTypes.DELETE_CHOICE_REQUEST
-});
-
-export const deleteChoiceSuccess = id => ({
-  type: actionTypes.DELETE_CHOICE_SUCCESS,
-  payload: id
-});
-
-export const deleteChoiceFailure = () => ({
-  type: actionTypes.DELETE_CHOICE_FAILURE
-});
-
-export const deleteChoice = (id, topic_slug) => {
-  return dispatch => {
-    dispatch(deleteChoiceRequest());
-    api
-      .deleteChoiceApi(id)
-      .then(res => {
-        dispatch(deleteChoiceSuccess(id));
-        refreshTopic(topic_slug, dispatch);
-        message.success("Choice deleted successfully!");
-      })
-      .catch(err => {
-        dispatch(deleteChoiceFailure());
-        message.error("Something went wrong");
-      });
-  };
-};

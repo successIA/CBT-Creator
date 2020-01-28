@@ -253,35 +253,78 @@ class QuestionRetrieveUpdateDestroyViewTest(APITestCase):
         self.assertEqual(choices[2].body, "new choice")
         self.assertEqual(choices[2].is_answer, True)
 
+    def test_update_with_deleted_choice(self):
+        id_of_choice_to_delete = Choice.objects.get(pk=1).id
+        post_data = {
+            "topic": self.topic.slug,
+            "id": self.question.pk,
+            "body": "Random question changed?",
+            "question_type": "multiple",
+            "choices": [
+                {
+                    "id": 2,
+                    "body": "choice 2 changed",
+                    "is_answer": "true"
+                },
+                {
+                    "id": 0,
+                    "body": "new choice",
+                    "is_answer": "true"
+                }
+            ]
+        }
+        response = self.client.put(
+            self.detail_edit_delete_url, post_data, format="json"
+        )
+        self.assertEqual(response.status_code, 200)
+        read_data = json.loads(response.content)
+        expected_data = {
+            "topic": self.topic.slug,
+            "id": self.question.pk,
+            "body": "Random question changed?",
+            "question_type": "multiple",
+            "choices": [
+                {
+                    "id": 2,
+                    "body": "choice 2 changed",
+                    "is_answer": True
+                },
+                {
+                    "id": 3,
+                    "body": "new choice",
+                    "is_answer": True
+                }
+            ],
+            "url": f"http://testserver/auth/questions/{self.question.pk}/"
+        }
+
+        self.assertEqual(read_data, expected_data)
+
+        self.assertNotIn(
+            id_of_choice_to_delete,
+            [ch.id for ch in Choice.objects.all()]
+        )
+
+        topic = Topic.objects.get(slug=self.topic.slug)
+        self.assertEqual(topic.slug, self.topic.slug)
+
+        question = Question.objects.get(pk=self.question.pk)
+        self.assertEqual(question.pk, self.question.pk)
+        self.assertEqual(question.body, "Random question changed?")
+        self.assertEqual(question.question_type, "multiple")
+
+        choices = question.choices.all()
+        self.assertEqual(choices.count(), 2)
+        self.assertEqual(choices[0].pk, 2)
+        self.assertEqual(choices[0].body, "choice 2 changed")
+        self.assertEqual(choices[0].is_answer, True)
+
+        self.assertEqual(choices[1].pk, 3)
+        self.assertEqual(choices[1].body, "new choice")
+        self.assertEqual(choices[1].is_answer, True)
+
     def test_delete(self):
         previous_count = Question.objects.count()
         response = self.client.delete(self.detail_edit_delete_url)
         self.assertEqual(response.status_code, 204)
         self.assertEquals(Question.objects.count(), previous_count - 1)
-
-
-class ChoiceDestroyViewTest(APITestCase):
-    def setUp(self):
-        self.topic = Topic.objects.create(title="Python Data Types")
-        self.question = Question.objects.create(
-            topic=self.topic,
-            body="Which of the is an integer in python?",
-            question_type="single"
-        )
-        self.question_ch = Choice.objects.create(
-            question=self.question, body="-2", is_answer=True
-        )
-        self.question_ch2 = Choice.objects.create(question=self.question, body="2.0")
-
-        self.detail_edit_delete_url = reverse(
-            "question-detail-edit-delete", kwargs={"pk": self.question.pk}
-        )
-
-        self.delete_url = reverse("choice-delete", kwargs={"pk": self.question_ch.pk})
-
-    def test_delete(self):
-        previous_count = self.question.choices.count()
-        response = self.client.delete(self.delete_url)
-        self.assertEqual(response.status_code, 204)
-        current_count = Question.objects.get(pk=self.question.pk).choices.count()
-        self.assertEqual(current_count, previous_count - 1)

@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { updateQuestion, deleteChoice, hideModal } from "../../actions";
+import { updateQuestion, hideModal } from "../../actions";
 import QuestionForm from "../../components/QuestionForm";
 import withQuestionType from "../../hoc/withQuestionType";
 
@@ -25,10 +25,6 @@ class UpdateQuestion extends React.Component {
     } else if (this.questionToEdit.question_type === "multiple") {
       this.multipleTypeQuestion = this.questionToEdit;
     }
-  };
-
-  handleChoiceDelete = choiceToDelete => {
-    this.props.deleteChoice(choiceToDelete.id, this.props.question.topic);
   };
 
   handleSubmit = editedQuestion => {
@@ -64,7 +60,6 @@ class UpdateQuestion extends React.Component {
         multipleTypeQuestion={this.multipleTypeQuestion}
         modalTitle="Edit Question"
         hideModal={hideModal}
-        onChoiceDelete={this.handleChoiceDelete}
         deletedChoiceId={deletedChoiceId}
         onSubmit={this.handleSubmit}
         isSubmitting={isSubmitting}
@@ -85,8 +80,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
   hideModal,
-  updateQuestion,
-  deleteChoice
+  updateQuestion
 };
 export default connect(
   mapStateToProps,
