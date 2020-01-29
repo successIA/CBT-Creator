@@ -51,10 +51,18 @@ class UpdateQuestion extends React.Component {
   }
 
   render() {
-    const { hideModal, deletedChoiceId, isSubmitting } = this.props;
+    const {
+      saveSuccess,
+      validationError,
+      hideModal,
+      deletedChoiceId,
+      isSubmitting
+    } = this.props;
 
     return (
       <QuestionForm
+        saveSuccess={saveSuccess}
+        error={validationError}
         question={this.questionToEdit}
         singleTypeQuestion={this.singleTypeQuestion}
         multipleTypeQuestion={this.multipleTypeQuestion}
@@ -74,7 +82,8 @@ const mapStateToProps = state => {
   return {
     isSubmitting: state.question.isSubmitting,
     deletedChoiceId: state.question.deletedChoiceId,
-    saveSuccess: state.question.saveSuccess
+    saveSuccess: state.question.saveSuccess,
+    validationError: state.question.validationError
   };
 };
 

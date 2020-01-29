@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, Form, Input, Tabs, Button, message } from "antd";
 import ChoiceInputList from "../ChoiceInputList";
 import { INITIAL_CHOICE_STATE, INITIAL_QUESTION_STATE } from "../../constants";
+// import getFirstMessage from "../../utils/getFirstMessage";
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -16,10 +17,24 @@ export default class QuestionForm extends React.Component {
       topic,
       body,
       question_type,
-      choices
+      choices,
+      error: null
     };
     this.singleTypeQuestionState = this.props.singleTypeQuestion;
     this.multipleTypeQuestionState = this.props.multipleTypeQuestion;
+  }
+
+  componentDidUpdate(prevProps) {
+    const { error, saveSuccess, shouldResetForm } = this.props;
+    if (error && error !== prevProps.error) {
+      // message.error(getFirstMessage(error));
+      this.setState({
+        ...this.state,
+        error
+      });
+    } else if (saveSuccess && saveSuccess !== prevProps.saveSuccess) {
+      if (shouldResetForm) this.resetForm();
+    }
   }
 
   handleBodyChange = e => {
@@ -85,62 +100,14 @@ export default class QuestionForm extends React.Component {
     });
   };
 
-  checkChoicesValidity = choices => {
-    let isValid = true;
-    let hasSelectedAnAnswer = false;
-    let hasAnswerWithEmptyBody = false;
-    let numOfEnteredChoices = 0;
-    choices.map((choice, index, array) => {
-      if (choice.body.trim().length) ++numOfEnteredChoices;
-      if (choice.is_answer) hasSelectedAnAnswer = choice.is_answer;
-      if (choice.is_answer && !choice.body.trim().length) {
-        hasAnswerWithEmptyBody = true;
-      }
-      if (index === array.length - 1) {
-        if (numOfEnteredChoices < 2) {
-          message.error("Minimum of two vaild choices are required");
-          isValid = false;
-        } else if (hasAnswerWithEmptyBody) {
-          message.error("The correct choice must have a label");
-          isValid = false;
-        } else if (index === array.length - 1 && !hasSelectedAnAnswer) {
-          message.error("You must select a correct answer");
-          isValid = false;
-        }
-      }
-      return choice;
-    });
-    return isValid;
-  };
-
-  checkQuestionValidity = question => {
-    if (!question.body.trim().length) {
-      message.error("The body of the question is required.");
-      return false;
-    }
-    return this.checkChoicesValidity(question.choices);
-  };
-
   handleSubmit = () => {
-    const unvalidatedQuestion = {
+    const question = {
+      topic: this.state.topic,
       body: this.state.body,
       question_type: this.state.question_type,
-      choices: this.state.choices
+      choices: [...this.state.choices]
     };
-
-    if (this.checkQuestionValidity(unvalidatedQuestion)) {
-      const cleanedChoices = this.state.choices.filter(
-        choice => choice.body.trim().length
-      );
-      const validatedQuestion = {
-        topic: this.state.topic,
-        body: this.state.body,
-        question_type: this.state.question_type,
-        choices: cleanedChoices
-      };
-      this.props.onSubmit(validatedQuestion);
-      if (this.props.shouldResetForm) this.resetForm();
-    }
+    this.props.onSubmit(question);
   };
 
   resetForm = () => {
@@ -151,6 +118,16 @@ export default class QuestionForm extends React.Component {
   };
 
   render() {
+    const bodyErrorSpan =
+      this.state.error && this.state.error.body ? (
+        <p style={{ color: "#ff4d4f" }}>{this.state.error.body}</p>
+      ) : null;
+
+    const choiceErrorSpan =
+      this.state.error && this.state.error.choices ? (
+        <div style={{ color: "#ff4d4f" }}>{this.state.error.choices}</div>
+      ) : null;
+
     return (
       <div>
         <Modal
@@ -180,6 +157,7 @@ export default class QuestionForm extends React.Component {
               value={this.state.body}
               onChange={this.handleBodyChange}
             />
+            {bodyErrorSpan}
             <Tabs
               defaultActiveKey={this.state.question_type}
               onChange={this.handleTabChange}
@@ -196,6 +174,7 @@ export default class QuestionForm extends React.Component {
                     onChoiceDelete={this.handleChoiceDelete}
                   />
                 )}
+                {choiceErrorSpan}
               </TabPane>
               <TabPane tab="Multiple" key="multiple">
                 {this.state.choices.length && (
@@ -208,6 +187,7 @@ export default class QuestionForm extends React.Component {
                     onChoiceDelete={this.handleChoiceDelete}
                   />
                 )}
+                {choiceErrorSpan}
               </TabPane>
             </Tabs>
           </Form>

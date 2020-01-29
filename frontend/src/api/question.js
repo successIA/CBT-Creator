@@ -21,7 +21,3 @@ export const updateQuestionApi = (id, editedQuestion) => {
 export const deleteQuestionApi = id => {
   return axios.delete(`${constants.BASE_QUESTION_DELETE_URL}${id}`);
 };
-
-export const deleteChoiceApi = id => {
-  return axios.delete(`${constants.BASE_CHOICE_DELETE_URL}${id}`);
-};

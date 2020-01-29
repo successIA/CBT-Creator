@@ -2,11 +2,31 @@ import * as actionTypes from "../actions/types";
 
 const initialState = {
   isSubmitting: false,
-  saveSuccess: false
+  saveSuccess: false,
+  validationError: null,
+  isValid: null
 };
 
 const question = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.QUESTION_VALIDATION_REQUEST:
+      return {
+        ...state,
+        validationError: null,
+        isValid: false
+      };
+    case actionTypes.QUESTION_VALIDATION_SUCCESS:
+      return {
+        ...state,
+        validationError: null,
+        isValid: true
+      };
+    case actionTypes.QUESTION_VALIDATION_FAILURE:
+      return {
+        ...state,
+        validationError: action.payload,
+        isValid: false
+      };
     case actionTypes.CREATE_QUESTION_REQUEST:
       return {
         ...state,
@@ -20,7 +40,11 @@ const question = (state = initialState, action) => {
         saveSuccess: true
       };
     case actionTypes.CREATE_QUESTION_FAILURE:
-      return { ...state, isSubmitting: false, saveSuccess: false };
+      return {
+        ...state,
+        isSubmitting: false,
+        saveSuccess: false
+      };
     case actionTypes.UPDATE_QUESTION_REQUEST:
       return {
         ...state,

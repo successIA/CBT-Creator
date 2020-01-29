@@ -2,6 +2,40 @@ import * as actionTypes from "./types";
 import { message } from "antd";
 import * as api from "../api/question";
 import { refreshTopic } from "./topic";
+import hasAnyNonEmptyItem from "../utils/hasAnyNonEmptyItem";
+import questionValidator from "../validators/questionValidator";
+import checkValidity from "../validators/checkValidity";
+
+export const validateQuestionRequest = question => ({
+  type: actionTypes.QUESTION_VALIDATION_REQUEST,
+  payload: question
+});
+
+export const validateQuestionSuccess = () => ({
+  type: actionTypes.QUESTION_VALIDATION_SUCCESS
+});
+
+export const validateQuestionFailure = errors => ({
+  type: actionTypes.QUESTION_VALIDATION_FAILURE,
+  payload: errors
+});
+
+export const validateQuestion = (question, dispatch) => {
+  dispatch(validateQuestionRequest(question));
+  const { topic, body, question_type, choices } = question;
+  question = {
+    topic,
+    body,
+    question_type,
+    choices
+  };
+  const errors = checkValidity(question, questionValidator);
+  if (!hasAnyNonEmptyItem(errors)) {
+    dispatch(validateQuestionFailure(errors));
+  } else {
+    dispatch(validateQuestionSuccess());
+  }
+};
 
 export const createQuestionRequest = () => ({
   type: actionTypes.CREATE_QUESTION_REQUEST
@@ -17,7 +51,11 @@ export const createQuestionFailure = () => ({
 });
 
 export const createQuestion = (question, topic_slug) => {
-  return dispatch => {
+  return (dispatch, getState) => {
+    validateQuestion(question, dispatch);
+
+    if (!getState().question.isValid) return;
+
     dispatch(createQuestionRequest());
     api
       .createQuestionApi(question)
@@ -46,7 +84,11 @@ export const updateQuestionFailure = () => ({
 });
 
 export const updateQuestion = (id, editedQuestion, topic_slug) => {
-  return dispatch => {
+  return (dispatch, getState) => {
+    validateQuestion(editedQuestion, dispatch);
+
+    if (!getState().question.isValid) return;
+
     dispatch(updateQuestionRequest());
     api
       .updateQuestionApi(id, editedQuestion)

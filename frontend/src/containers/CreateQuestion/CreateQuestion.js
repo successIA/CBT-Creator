@@ -12,6 +12,8 @@ class CreateQuestion extends React.Component {
   render() {
     const {
       isSubmitting,
+      saveSuccess,
+      validationError,
       question,
       singleTypeQuestion,
       multipleTypeQuestion,
@@ -20,6 +22,8 @@ class CreateQuestion extends React.Component {
 
     return (
       <QuestionForm
+        saveSuccess={saveSuccess}
+        error={validationError}
         question={question}
         singleTypeQuestion={singleTypeQuestion}
         multipleTypeQuestion={multipleTypeQuestion}
@@ -36,7 +40,9 @@ class CreateQuestion extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    isSubmitting: state.question.isSubmitting
+    isSubmitting: state.question.isSubmitting,
+    saveSuccess: state.question.saveSuccess,
+    validationError: state.question.validationError
   };
 };
 

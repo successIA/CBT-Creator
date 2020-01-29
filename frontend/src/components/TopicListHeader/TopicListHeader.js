@@ -36,7 +36,6 @@ const TopicListHeader = ({ showModal }) => {
       </Row>
     </div>
   );
-  //   }
 };
 
 export default TopicListHeader;
