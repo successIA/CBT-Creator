@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from quiz.models import Choice, Question, Topic
 
+from .validators import validate_choice_and_question_type
+
 
 class ChoiceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=False, write_only=False, required=False)
@@ -67,7 +69,7 @@ class QuestionCreateSerializer(serializers.HyperlinkedModelSerializer):
     topic = serializers.SlugRelatedField(
         slug_field="slug", queryset=Topic.objects.all()
     )
-    choices = ChoiceCreateSerializer(many=True)
+    choices = ChoiceCreateSerializer(many=True, required=True)
     url = serializers.HyperlinkedIdentityField(
         view_name="question-detail-edit-delete",
         lookup_field="pk",
@@ -78,6 +80,23 @@ class QuestionCreateSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Question
         fields = ["topic", "id", "body", "question_type", "choices", "url"]
+
+    def validate(self, data):
+        choice_data = data["choices"]
+        if not choice_data:
+            raise serializers.ValidationError("Empty choices field")
+        if len(choice_data) < 2:
+            raise serializers.ValidationError(
+                "A question must have at least two choices"
+            )
+        answer_count = len([c_d for c_d in choice_data if c_d["is_answer"]])
+        if not answer_count:
+            raise serializers.ValidationError("You must select a correct answer")
+        elif answer_count > 1 and data["question_type"] == "single":
+            raise serializers.ValidationError(
+                "A single type question can only have one valid answer"
+            )
+        return data
 
     def create(self, validated_data):
         choice_data_list = validated_data.pop("choices")
@@ -106,6 +125,9 @@ class QuestionRetrieveUpdateDestroySerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ["topic", "id", "body", "question_type", "choices", "url"]
+
+    def validate(self, data):
+        return validate_choice_and_question_type(data)
 
     def update(self, instance, validated_data):
         with transaction.atomic():

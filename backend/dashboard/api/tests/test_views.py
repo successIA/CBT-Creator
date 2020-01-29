@@ -149,6 +149,94 @@ class QuestionCreateTest(APITestCase):
         self.assertEqual(read_data, expected_data)
         self.assertEquals(Question.objects.count(), previous_count + 1)
 
+    def test_create_with_invalid_choice_data(self):
+        post_data = {
+            "topic": self.topic.slug,
+            "body": "Random question?",
+            "question_type": "single",
+            "choices": [
+                {
+                    "body": "",
+                    "is_answer": "true"
+                },
+                {
+                    "body": "4",
+                    "is_answer": "false"
+                }
+            ]
+        }
+        response = self.client.post(self.question_create_url, post_data, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            "A question must have at least two choices",
+            response.content.decode()
+        )
+
+    def test_create_with_choice_data_with_no_answer(self):
+        post_data = {
+            "topic": self.topic.slug,
+            "body": "Random question?",
+            "question_type": "single",
+            "choices": [
+                {
+                    "body": "45",
+                    "is_answer": "false"
+                },
+                {
+                    "body": "4",
+                    "is_answer": "false"
+                }
+            ]
+        }
+        response = self.client.post(self.question_create_url, post_data, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            "You must select a correct answer",
+            response.content.decode()
+        )
+
+    def test_create_with_choice_data_with_two_answers_for_single_type_question(self):
+        post_data = {
+            "topic": self.topic.slug,
+            "body": "Random question?",
+            "question_type": "single",
+            "choices": [
+                {
+                    "body": "45",
+                    "is_answer": "true"
+                },
+                {
+                    "body": "4",
+                    "is_answer": "true"
+                }
+            ]
+        }
+        response = self.client.post(self.question_create_url, post_data, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            "A single type question can only have one valid answer",
+            response.content.decode()
+        )
+
+    def test_create_with_choice_data_with_two_answers_for_multiple_type_question(self):
+        post_data = {
+            "topic": self.topic.slug,
+            "body": "Random question?",
+            "question_type": "multiple",
+            "choices": [
+                {
+                    "body": "45",
+                    "is_answer": "true"
+                },
+                {
+                    "body": "4",
+                    "is_answer": "true"
+                }
+            ]
+        }
+        response = self.client.post(self.question_create_url, post_data, format="json")
+        self.assertEqual(response.status_code, 201)
+
 
 class QuestionRetrieveUpdateDestroyViewTest(APITestCase):
     def setUp(self):
@@ -192,7 +280,7 @@ class QuestionRetrieveUpdateDestroyViewTest(APITestCase):
                     "is_answer": "true"
                 },
                 {
-                    "id": 0,
+                    # "id": 0,
                     "body": "new choice",
                     "is_answer": "true"
                 }
@@ -322,6 +410,110 @@ class QuestionRetrieveUpdateDestroyViewTest(APITestCase):
         self.assertEqual(choices[1].pk, 3)
         self.assertEqual(choices[1].body, "new choice")
         self.assertEqual(choices[1].is_answer, True)
+
+    def test_update_with_invalid_choice_data(self):
+        post_data = {
+            "topic": self.topic.slug,
+            "id": self.question.pk,
+            "body": "Random question?",
+            "question_type": "single",
+            "choices": [
+                {
+                    "id": 1,
+                    "body": "",
+                    "is_answer": "false"
+                },
+                {
+                    "id": 2,
+                    "body": "choice 2 changed",
+                    "is_answer": "true"
+                },
+            ]
+        }
+        response = self.client.put(
+            self.detail_edit_delete_url, post_data, format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_with_choice_data_with_no_answer(self):
+        post_data = {
+            "topic": self.topic.slug,
+            "id": self.question.pk,
+            "body": "Random question?",
+            "question_type": "single",
+            "choices": [
+                {
+                    "id": 1,
+                    "body": "kk",
+                    "is_answer": "false"
+                },
+                {
+                    "id": 2,
+                    "body": "choice 2 changed",
+                    "is_answer": "false"
+                },
+            ]
+        }
+        response = self.client.put(
+            self.detail_edit_delete_url, post_data, format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            "You must select a correct answer",
+            response.content.decode()
+        )
+
+    def test_create_with_choice_data_with_two_answers_for_single_type_question(self):
+        post_data = {
+            "topic": self.topic.slug,
+            "id": self.question.pk,
+            "body": "Random question?",
+            "question_type": "single",
+            "choices": [
+                {
+                    "id": 1,
+                    "body": "kk",
+                    "is_answer": "true"
+                },
+                {
+                    "id": 2,
+                    "body": "choice 2 changed",
+                    "is_answer": "true"
+                },
+            ]
+        }
+        response = self.client.put(
+            self.detail_edit_delete_url, post_data, format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            "A single type question can only have one valid answer",
+            response.content.decode()
+        )
+
+    def test_update_with_choice_data_with_two_answers_for_multiple_type_question(self):
+        post_data = {
+            "topic": self.topic.slug,
+            "id": self.question.pk,
+            "body": "Random question?",
+            "question_type": "multiple",
+            "choices": [
+                {
+                    "id": 1,
+                    "body": "kk",
+                    "is_answer": "true"
+                },
+                {
+                    "id": 2,
+                    "body": "choice 2 changed",
+                    "is_answer": "true"
+                },
+            ]
+        }
+        response = self.client.put(
+            self.detail_edit_delete_url, post_data, format="json"
+        )
+        self.assertEqual(response.status_code, 200)
 
     def test_delete(self):
         previous_count = Question.objects.count()
