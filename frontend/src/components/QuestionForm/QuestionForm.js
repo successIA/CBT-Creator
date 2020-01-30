@@ -10,22 +10,50 @@ const { TabPane } = Tabs;
 const MINIMUM_CHOICE_COUNT = 2;
 
 export default class QuestionForm extends React.Component {
-  constructor(props) {
-    super(props);
-    const { topic, body, question_type, choices } = this.props.question;
-    this.state = {
-      topic,
-      body,
-      question_type,
-      choices,
-      error: null
-    };
-    this.singleTypeQuestionState = this.props.singleTypeQuestion;
-    this.multipleTypeQuestionState = this.props.multipleTypeQuestion;
-  }
+  // constructor(props) {
+  //   super(props);
+  //   const { topic, body, question_type, choices } = this.props.question;
+  //   this.state = {
+  //     topic,
+  //     body,
+  //     question_type,
+  //     choices,
+  //     error: null
+  //   };
+  //   this.singleTypeQuestionState = this.props.singleTypeQuestion;
+  //   this.multipleTypeQuestionState = this.props.multipleTypeQuestion;
+  // }
+
+  state = {
+    topic: this.props.question.topic,
+    body: this.props.question.body,
+    question_type: this.props.question.question_type,
+    choices: this.props.question.choices,
+    error: null
+  };
 
   componentDidUpdate(prevProps) {
-    const { error, saveSuccess, shouldResetForm } = this.props;
+    console.log("prevProps:", prevProps);
+    console.log("this.props:", this.props);
+    const { question, error, saveSuccess, shouldResetForm } = this.props;
+    if (question && question.id !== prevProps.question.id) {
+      this.setState({
+        body: question.body,
+        question_type: question.question_type,
+        choices: question.choices,
+        error: null
+      });
+    } else if (
+      question &&
+      question.question_type !== prevProps.question.question_type
+    ) {
+      this.setState({
+        body: question.body,
+        question_type: question.question_type,
+        choices: question.choices,
+        error: null
+      });
+    }
     if (error && error !== prevProps.error) {
       // message.error(getFirstMessage(error));
       this.setState({
@@ -33,7 +61,9 @@ export default class QuestionForm extends React.Component {
         error
       });
     } else if (saveSuccess && saveSuccess !== prevProps.saveSuccess) {
-      if (shouldResetForm) this.resetForm();
+      if (shouldResetForm) {
+        this.resetForm();
+      }
     }
   }
 
@@ -64,17 +94,24 @@ export default class QuestionForm extends React.Component {
   };
 
   handleTabChange = key => {
-    if (key === "multiple") {
-      this.singleTypeQuestionState = this.state;
-      this.setState({
-        ...this.multipleTypeQuestionState
-      });
-    } else if (key === "single") {
-      this.multipleTypeQuestionState = this.state;
-      this.setState({
-        ...this.singleTypeQuestionState
-      });
-    }
+    const question = {
+      topic: this.state.topic,
+      body: this.state.body,
+      question_type: this.state.question_type,
+      choices: [...this.state.choices]
+    };
+    this.props.onQuestionTypeChange(question);
+    // if (key === "multiple") {
+    //   this.singleTypeQuestionState = this.state;
+    //   this.setState({
+    //     ...this.multipleTypeQuestionState
+    //   });
+    // } else if (key === "single") {
+    //   this.multipleTypeQuestionState = this.state;
+    //   this.setState({
+    //     ...this.singleTypeQuestionState
+    //   });
+    // }
   };
 
   handleChoiceAdd = (index, top) => {
@@ -113,11 +150,24 @@ export default class QuestionForm extends React.Component {
   resetForm = () => {
     this.setState({
       ...INITIAL_QUESTION_STATE,
-      question_type: this.state.question_type
+      question_type: this.state.question_type,
+      error: null
     });
   };
 
+  handleModalClose = () => {
+    const question = {
+      topic: this.state.topic,
+      body: this.state.body,
+      question_type: this.state.question_type,
+      choices: [...this.state.choices]
+    };
+    this.props.onHideModal(question);
+  };
+
   render() {
+    console.log(this.props);
+
     const bodyErrorSpan =
       this.state.error && this.state.error.body ? (
         <p style={{ color: "#ff4d4f" }}>{this.state.error.body}</p>
@@ -134,9 +184,9 @@ export default class QuestionForm extends React.Component {
           title={this.props.modalTitle}
           visible={true}
           onOk={this.handleSubmit}
-          onCancel={this.props.hideModal}
+          onCancel={this.handleModalClose}
           footer={[
-            <Button key="back" onClick={this.props.hideModal}>
+            <Button key="back" onClick={this.handleModalClose}>
               Cancel
             </Button>,
             <Button

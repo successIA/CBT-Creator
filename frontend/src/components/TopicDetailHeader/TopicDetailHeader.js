@@ -26,7 +26,7 @@ export const TopicDetailHeader = ({ slug, title, showModal }) => {
             type="primary"
             onClick={() =>
               showModal(constants.CREATE_QUESTION, {
-                question: { topic: slug, ...constants.INITIAL_QUESTION_STATE }
+                topic: slug
               })
             }
           >

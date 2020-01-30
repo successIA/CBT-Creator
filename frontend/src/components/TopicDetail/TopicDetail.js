@@ -15,7 +15,7 @@ const TopicDetail = ({
 }) => {
   const handleQuestionEdit = questionToEdit => {
     showModal(constants.UPDATE_QUESTION, {
-      question: questionToEdit
+      questionToEdit
     });
   };
 
