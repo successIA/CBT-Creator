@@ -1,50 +1,31 @@
 import React from "react";
 import { connect } from "react-redux";
-import {
-  updateQuestion,
-  hideModal,
-  saveQuestion,
-  changeQuestionType
-} from "../../actions";
+import { updateQuestion, hideModal } from "../../actions";
 import QuestionForm from "../../components/QuestionForm";
 import withQuestionType from "../../hoc/withQuestionType";
-import { INITIAL_QUESTION_STATE } from "../../constants";
 
 class UpdateQuestion extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  //   // const { topic, body, question_type, choices } = this.props.question;
-  //   // this.questionToEdit = {
-  //   //   topic,
-  //   //   body,
-  //   //   question_type,
-  //   //   choices
-  //   // };
-  //   this.singleTypeQuestion = this.props.singleTypeQuestion;
-  //   this.multipleTypeQuestion = this.props.multipleTypeQuestion;
-  //   // this.updateQuestionTypes();
-  // }
-
-  componentDidMount() {
-    this.props.saveQuestion(this.props.questionToEdit);
+  constructor(props) {
+    super(props);
+    const { topic, body, question_type, choices } = this.props.question;
+    this.questionToEdit = {
+      topic,
+      body,
+      question_type,
+      choices
+    };
+    this.singleTypeQuestion = this.props.singleTypeQuestion;
+    this.multipleTypeQuestion = this.props.multipleTypeQuestion;
+    this.updateQuestionTypes();
   }
 
-  handleModalClose = question => {
-    this.props.saveQuestion(INITIAL_QUESTION_STATE);
-    this.props.hideModal();
+  updateQuestionTypes = () => {
+    if (this.questionToEdit.question_type === "single") {
+      this.singleTypeQuestion = this.questionToEdit;
+    } else if (this.questionToEdit.question_type === "multiple") {
+      this.multipleTypeQuestion = this.questionToEdit;
+    }
   };
-
-  handleQuestionTypeChange = question => {
-    this.props.changeQuestionType(question);
-  };
-
-  // updateQuestionTypes = () => {
-  //   if (this.questionToEdit.question_type === "single") {
-  //     this.singleTypeQuestion = this.questionToEdit;
-  //   } else if (this.questionToEdit.question_type === "multiple") {
-  //     this.multipleTypeQuestion = this.questionToEdit;
-  //   }
-  // };
 
   handleSubmit = editedQuestion => {
     editedQuestion = {
@@ -71,7 +52,6 @@ class UpdateQuestion extends React.Component {
 
   render() {
     const {
-      question,
       saveSuccess,
       validationError,
       hideModal,
@@ -83,10 +63,11 @@ class UpdateQuestion extends React.Component {
       <QuestionForm
         saveSuccess={saveSuccess}
         error={validationError}
-        question={question}
-        onQuestionTypeChange={this.handleQuestionTypeChange}
+        question={this.questionToEdit}
+        singleTypeQuestion={this.singleTypeQuestion}
+        multipleTypeQuestion={this.multipleTypeQuestion}
         modalTitle="Edit Question"
-        onHideModal={this.handleModalClose}
+        hideModal={hideModal}
         deletedChoiceId={deletedChoiceId}
         onSubmit={this.handleSubmit}
         isSubmitting={isSubmitting}
@@ -97,17 +78,8 @@ class UpdateQuestion extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  const { body, question_type, choices } = state.question;
-  const question = {
-    id: ownProps.questionToEdit.id,
-    topic: ownProps.questionToEdit.topic,
-    body,
-    question_type,
-    choices
-  };
+const mapStateToProps = state => {
   return {
-    question,
     isSubmitting: state.question.isSubmitting,
     deletedChoiceId: state.question.deletedChoiceId,
     saveSuccess: state.question.saveSuccess,
@@ -117,8 +89,9 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = {
   hideModal,
-  updateQuestion,
-  saveQuestion,
-  changeQuestionType
+  updateQuestion
 };
-export default connect(mapStateToProps, mapDispatchToProps)(UpdateQuestion);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withQuestionType(UpdateQuestion));

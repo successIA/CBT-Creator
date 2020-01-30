@@ -6,16 +6,6 @@ import hasAnyNonEmptyItem from "../utils/hasAnyNonEmptyItem";
 import questionValidator from "../validators/questionValidator";
 import checkValidity from "../validators/checkValidity";
 
-export const saveQuestion = question => ({
-  type: actionTypes.SAVE_QUESTION,
-  payload: question
-});
-
-export const changeQuestionType = question => ({
-  type: actionTypes.CHANGE_QUESTION_TYPE,
-  payload: question
-});
-
 export const validateQuestionRequest = question => ({
   type: actionTypes.QUESTION_VALIDATION_REQUEST,
   payload: question
@@ -56,9 +46,8 @@ export const createQuestionSuccess = question => ({
   payload: question
 });
 
-export const createQuestionFailure = error => ({
-  type: actionTypes.CREATE_QUESTION_FAILURE,
-  payload: error
+export const createQuestionFailure = () => ({
+  type: actionTypes.CREATE_QUESTION_FAILURE
 });
 
 export const createQuestion = (question, topic_slug) => {
@@ -66,7 +55,7 @@ export const createQuestion = (question, topic_slug) => {
     validateQuestion(question, dispatch);
 
     if (!getState().question.isValid) return;
-    console.log(question);
+
     dispatch(createQuestionRequest());
     api
       .createQuestionApi(question)
@@ -76,7 +65,7 @@ export const createQuestion = (question, topic_slug) => {
         message.success("Question added successfully!");
       })
       .catch(err => {
-        dispatch(createQuestionFailure(err.response.data));
+        dispatch(createQuestionFailure());
         message.error("Something went wrong");
       });
   };
