@@ -6,6 +6,7 @@ import ModalRoot from "../containers/ModalRoot";
 import Topic from "../containers/Topic";
 import "antd/dist/antd.css";
 import "./App.css";
+import TopicListTable from "../components/TopicListTable";
 
 const { Header, Content } = Layout;
 
@@ -24,6 +25,8 @@ function App() {
           <Content>
             <Switch>
               <Route exact path="/" component={Home} />
+              {/* <Route exact path="/" component={TopicListTable} /> */}
+
               <Route exact path="/auth/topics/:slug/" component={Topic} />
             </Switch>
             <ModalRoot />

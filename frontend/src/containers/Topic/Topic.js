@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { fetchTopic, showModal } from "../../actions";
 import { deleteQuestion } from "../../actions/question";
 import TopicDetail from "../../components/TopicDetail";
+import TopicDetailTable from "../../components/TopicDetailTable";
 
 class Topic extends React.Component {
   slug = this.props.match.params.slug;
@@ -23,7 +24,16 @@ class Topic extends React.Component {
     } = this.props;
 
     return (
-      <TopicDetail
+      // <TopicDetail
+      //   isLoading={isLoading}
+      //   slug={slug}
+      //   title={title}
+      //   questions={questions}
+      //   fetchError={fetchError}
+      //   showModal={showModal}
+      //   deleteQuestion={deleteQuestion}
+      // />
+      <TopicDetailTable
         isLoading={isLoading}
         slug={slug}
         title={title}

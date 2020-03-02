@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { fetchTopics, deleteTopic, showModal } from "../../actions";
 import TopicList from "../../components/TopicList";
+import TopicListTable from "../../components/TopicListTable";
 
 class Home extends React.Component {
   componentDidMount() {
@@ -18,7 +19,14 @@ class Home extends React.Component {
     } = this.props;
 
     return (
-      <TopicList
+      // <TopicList
+      //   isLoading={isLoading}
+      //   topics={topics}
+      //   fetchError={fetchError}
+      //   showModal={showModal}
+      //   deleteTopic={deleteTopic}
+      // />
+      <TopicListTable
         isLoading={isLoading}
         topics={topics}
         fetchError={fetchError}
