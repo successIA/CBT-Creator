@@ -17,6 +17,9 @@ class Topic extends React.Component {
       isLoading,
       slug,
       title,
+      question,
+      singleTypeQuestion,
+      multipleTypeQuestion,
       questions,
       fetchError,
       showModal,
@@ -37,6 +40,9 @@ class Topic extends React.Component {
         isLoading={isLoading}
         slug={slug}
         title={title}
+        question={question}
+        singleTypeQuestion={singleTypeQuestion}
+        multipleTypeQuestion={multipleTypeQuestion}
         questions={questions}
         fetchError={fetchError}
         showModal={showModal}
@@ -50,6 +56,9 @@ const mapStateToProps = state => ({
   isLoading: state.topic.isLoading,
   slug: state.topic.slug,
   title: state.topic.title,
+  question: state.question.saved,
+  singleTypeQuestion: state.question.savedSingleType,
+  multipleTypeQuestion: state.question.savedMultipleType,
   questions: state.topic.questions,
   fetchError: state.topic.fetchError
 });

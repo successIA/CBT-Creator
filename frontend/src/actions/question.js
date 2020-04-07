@@ -6,6 +6,27 @@ import hasAnyNonEmptyItem from "../utils/hasAnyNonEmptyItem";
 import questionValidator from "../validators/questionValidator";
 import checkValidity from "../validators/checkValidity";
 
+export const saveQuestion = (
+  question,
+  singleTypeQuestion,
+  multipleTypeQuestion
+) => {
+  return {
+    type: actionTypes.SAVE_QUESTION,
+    payload: {
+      question,
+      singleTypeQuestion,
+      multipleTypeQuestion
+    }
+  };
+};
+
+export const resetQuestion = () => {
+  return {
+    type: actionTypes.RESET_QUESTION
+  };
+};
+
 export const validateQuestionRequest = question => ({
   type: actionTypes.QUESTION_VALIDATION_REQUEST,
   payload: question
@@ -55,6 +76,7 @@ export const createQuestion = (question, topic_slug) => {
     validateQuestion(question, dispatch);
 
     if (!getState().question.isValid) return;
+    console.log(question);
 
     dispatch(createQuestionRequest());
     api

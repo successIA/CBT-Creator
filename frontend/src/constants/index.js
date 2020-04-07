@@ -28,3 +28,8 @@ export const INITIAL_QUESTION_STATE = {
   question_type: "single",
   choices: getArrayByObjAndCount(INITIAL_CHOICE_STATE, DEFAULT_CHOICE_COUNT)
 };
+
+export const INITIAL_MULTIPLE_TYPE_QUESTION_STATE = {
+  ...INITIAL_QUESTION_STATE,
+  question_type: "multiple"
+};

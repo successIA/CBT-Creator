@@ -12,13 +12,13 @@ const MINIMUM_CHOICE_COUNT = 2;
 export default class QuestionForm extends React.Component {
   constructor(props) {
     super(props);
-    const { topic, body, question_type, choices } = this.props.question;
+    const { topic, body, question_type, choices, error } = this.props.question;
     this.state = {
       topic,
       body,
       question_type,
       choices,
-      error: null
+      error
     };
     this.singleTypeQuestionState = this.props.singleTypeQuestion;
     this.multipleTypeQuestionState = this.props.multipleTypeQuestion;
@@ -33,7 +33,10 @@ export default class QuestionForm extends React.Component {
         error
       });
     } else if (saveSuccess && saveSuccess !== prevProps.saveSuccess) {
-      if (shouldResetForm) this.resetForm();
+      if (shouldResetForm) {
+        this.resetForm();
+        this.props.resetQuestion();
+      }
     }
   }
 
@@ -113,8 +116,25 @@ export default class QuestionForm extends React.Component {
   resetForm = () => {
     this.setState({
       ...INITIAL_QUESTION_STATE,
-      question_type: this.state.question_type
+      question_type: this.state.question_type,
+      error: null
     });
+  };
+
+  handleCancel = () => {
+    const question = {
+      topic: this.state.topic,
+      body: this.state.body,
+      question_type: this.state.question_type,
+      choices: [...this.state.choices],
+      error: this.state.error
+    };
+    this.props.saveQuestion(
+      question,
+      this.singleTypeQuestionState,
+      this.multipleTypeQuestionState
+    );
+    this.props.hideModal();
   };
 
   render() {
@@ -134,9 +154,9 @@ export default class QuestionForm extends React.Component {
           title={this.props.modalTitle}
           visible={true}
           onOk={this.handleSubmit}
-          onCancel={this.props.hideModal}
+          onCancel={this.handleCancel}
           footer={[
-            <Button key="back" onClick={this.props.hideModal}>
+            <Button key="back" onClick={this.handleCancel}>
               Cancel
             </Button>,
             <Button

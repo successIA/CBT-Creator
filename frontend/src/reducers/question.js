@@ -1,6 +1,22 @@
 import * as actionTypes from "../actions/types";
+import {
+  INITIAL_CHOICE_STATE,
+  DEFAULT_CHOICE_COUNT,
+  INITIAL_QUESTION_STATE,
+  INITIAL_MULTIPLE_TYPE_QUESTION_STATE
+} from "../constants";
+import { getArrayByObjAndCount } from "../utils/getArrayByObjAndCount";
 
 const initialState = {
+  saved: {
+    topic: "",
+    body: "",
+    question_type: "single",
+    choices: getArrayByObjAndCount(INITIAL_CHOICE_STATE, DEFAULT_CHOICE_COUNT),
+    error: null
+  },
+  savedSingleType: { ...INITIAL_QUESTION_STATE, error: null },
+  savedMultipleType: { ...INITIAL_MULTIPLE_TYPE_QUESTION_STATE, error: null },
   isSubmitting: false,
   saveSuccess: false,
   validationError: null,
@@ -9,6 +25,33 @@ const initialState = {
 
 const question = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.SAVE_QUESTION:
+      const question = action.payload.question;
+      return {
+        ...state,
+        saved: {
+          topic: question.topic,
+          body: question.body,
+          question_type: question.question_type,
+          choices: question.choices,
+          error: question.error
+        },
+        savedSingleType: action.payload.singleTypeQuestion,
+        savedMultipleType: action.payload.multipleTypeQuestion
+      };
+    case actionTypes.RESET_QUESTION:
+      return {
+        ...state,
+        saved: {
+          topic: "",
+          body: "",
+          question_type: "single",
+          choices: [],
+          error: null
+        },
+        savedSingleType: INITIAL_QUESTION_STATE,
+        savedMultipleType: INITIAL_MULTIPLE_TYPE_QUESTION_STATE
+      };
     case actionTypes.QUESTION_VALIDATION_REQUEST:
       return {
         ...state,

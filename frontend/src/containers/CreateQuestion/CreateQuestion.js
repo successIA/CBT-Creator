@@ -1,6 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
-import { createQuestion, hideModal } from "../../actions";
+import {
+  createQuestion,
+  hideModal,
+  saveQuestion,
+  resetQuestion
+} from "../../actions";
 import QuestionForm from "../../components/QuestionForm";
 import withQuestionType from "../../hoc/withQuestionType";
 
@@ -17,7 +22,9 @@ class CreateQuestion extends React.Component {
       question,
       singleTypeQuestion,
       multipleTypeQuestion,
-      hideModal
+      hideModal,
+      saveQuestion,
+      resetQuestion
     } = this.props;
 
     return (
@@ -29,6 +36,8 @@ class CreateQuestion extends React.Component {
         multipleTypeQuestion={multipleTypeQuestion}
         modalTitle="Add Question"
         hideModal={hideModal}
+        saveQuestion={saveQuestion}
+        resetQuestion={resetQuestion}
         onSubmit={this.handleSubmit}
         isSubmitting={isSubmitting}
         modalSubmitText="Create"
@@ -48,9 +57,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
   hideModal,
-  createQuestion
+  createQuestion,
+  saveQuestion,
+  resetQuestion
 };
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withQuestionType(CreateQuestion));
+export default connect(mapStateToProps, mapDispatchToProps)(CreateQuestion);

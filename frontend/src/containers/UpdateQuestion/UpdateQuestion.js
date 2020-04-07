@@ -12,7 +12,8 @@ class UpdateQuestion extends React.Component {
       topic,
       body,
       question_type,
-      choices
+      choices,
+      error: null
     };
     this.singleTypeQuestion = this.props.singleTypeQuestion;
     this.multipleTypeQuestion = this.props.multipleTypeQuestion;
@@ -43,6 +44,10 @@ class UpdateQuestion extends React.Component {
     );
   };
 
+  handleQuestionSave = () => {};
+
+  handleQuestionReset = () => {};
+
   componentDidUpdate(prevProps) {
     const { saveSuccess } = this.props;
     if (prevProps.saveSuccess !== saveSuccess) {
@@ -67,6 +72,8 @@ class UpdateQuestion extends React.Component {
         singleTypeQuestion={this.singleTypeQuestion}
         multipleTypeQuestion={this.multipleTypeQuestion}
         modalTitle="Edit Question"
+        saveQuestion={this.handleQuestionSave}
+        resetQuestion={this.handleQuestionReset}
         hideModal={hideModal}
         deletedChoiceId={deletedChoiceId}
         onSubmit={this.handleSubmit}
@@ -91,7 +98,4 @@ const mapDispatchToProps = {
   hideModal,
   updateQuestion
 };
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withQuestionType(UpdateQuestion));
+export default connect(mapStateToProps, mapDispatchToProps)(UpdateQuestion);

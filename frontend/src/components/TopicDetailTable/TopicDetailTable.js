@@ -22,6 +22,9 @@ const TopicDetailTable = ({
   isLoading,
   slug,
   title,
+  question,
+  singleTypeQuestion,
+  multipleTypeQuestion,
   questions,
   fetchError,
   showModal,
@@ -29,7 +32,9 @@ const TopicDetailTable = ({
 }) => {
   const handleQuestionEdit = questionToEdit => {
     showModal(constants.UPDATE_QUESTION, {
-      question: questionToEdit
+      question: questionToEdit,
+      singleTypeQuestion,
+      multipleTypeQuestion
     });
   };
 
@@ -125,7 +130,14 @@ const TopicDetailTable = ({
   return (
     <Row>
       <Col span={20} offset={2}>
-        <TopicDetailHeader slug={slug} title={title} showModal={showModal} />
+        <TopicDetailHeader
+          slug={slug}
+          title={title}
+          question={question}
+          singleTypeQuestion={singleTypeQuestion}
+          multipleTypeQuestion={multipleTypeQuestion}
+          showModal={showModal}
+        />
         <Table
           style={{ background: "white", marginTop: "32" }}
           columns={columns}
